@@ -16,8 +16,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	$price = isset($_POST['price']) ? trim($_POST['price']) : '';
 	$category = isset($_POST['category']) ? trim($_POST['category']) : '';
 
-	if ($name === '') {
-		$errors[] = 'Nama product wajib diisi.';
+	if ($name === '' || strlen($name) > 255) {
+		$errors[] = 'Nama product wajib diisi dan tidak boleh lebih dari 255 karakter.';
 	}
 
 	if ($description === '') {
