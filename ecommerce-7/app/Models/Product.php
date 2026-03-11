@@ -16,7 +16,7 @@ class Product extends Model
         'product_category_id',
     ];
 
-    public function category()
+    public function product_category() // many to 1 relationship with ProductCategory model
     {
         return $this->belongsTo(ProductCategory::class, 'product_category_id');
     }

@@ -11,7 +11,7 @@ class ProductCategory extends Model
         'slug',
     ];
 
-    public function products()
+    public function products() // 1 to many relationship with Product model
     {
         return $this->hasMany(Product::class, 'product_category_id');
     }

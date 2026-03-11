@@ -6,7 +6,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ContohController;
 use App\Http\Controllers\ProductController;
 
-Route::get('/', [HomeController::class, 'index']);
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 
@@ -23,7 +23,7 @@ Route::prefix('admin')->group(function () {
 Route::get('/products', function () {
     return view('product');
 });
-Route::get('/product-detail', [HomeController::class, 'productDetails']);
+Route::get('/product-detail/{slug}', [HomeController::class, 'productDetails'])->name('product.detail');
 
 Route::get('/checkout', function () {
     echo "Checkout Page";

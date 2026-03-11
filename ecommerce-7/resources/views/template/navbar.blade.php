@@ -13,6 +13,10 @@
           <a class="nav-link" href="{{ route('cart.index') }}">Keranjang</a>
         </li>
       </ul>
+      <form action="{{ route('home') }}" method="GET" class="d-flex" role="search">
+        <input class="form-control me-2" type="search" name="search" value="{{ request('search') }}" placeholder="Search" aria-label="Search"/>
+        <button class="btn btn-outline-success" type="submit">Search</button>
+      </form>
     </div>
   </div>
 </nav>

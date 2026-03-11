@@ -14,7 +14,8 @@ class ProductCard extends Component
     public function __construct(
         public $name,
         public $price,
-        public $image
+        public $image,
+        public $slug,
     )
     {
         //
