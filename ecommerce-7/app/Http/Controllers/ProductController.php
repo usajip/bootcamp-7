@@ -10,9 +10,15 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        return view('admin.product.index');
+        $products = Product::with('product_category')
+                        ->orderBy('created_at', 'desc');
+        if ($request->has('search')) {
+            $products->where('name', 'like', '%' . $request->search . '%');
+        }
+        $products = $products->paginate(10);
+        return view('admin.product.index', compact('products'));
     }
 
     /**
