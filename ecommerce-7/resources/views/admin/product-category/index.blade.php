@@ -4,10 +4,10 @@
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 {{ __('Product Category') }}
             </h2>
-            <a href="{{ route('product-categories.create') }}"
-               class="inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                Tambah kategori
-            </a>
+            <x-primary-button
+                x-data=""
+                x-on:click.prevent="$dispatch('open-modal', 'create-new-category')"
+            >{{ __('Tambah Kategori') }}</x-primary-button>
         </div>
     </x-slot>
     <div class="py-12">
@@ -36,11 +36,13 @@
                                         <td>{{ $productCategory->total_stock }}</td>
                                         <td>
                                             <div class="flex items-center gap-2">
-                                                <a href="{{ route('product-categories.edit', $productCategory) }}"
-                                                   class="inline-flex items-center rounded-md bg-yellow-500 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-yellow-400">
-                                                    Edit
-                                                </a>
-
+                                                <x-primary-button
+                                                    x-data=""
+                                                    x-on:click.prevent="$dispatch('open-modal', 'edit-category.{{ $productCategory->id }}')"
+                                                    class=""
+                                                >
+                                                    {{ __('Edit') }}
+                                                </x-primary-button>
                                                 <form action="{{ route('product-categories.destroy', $productCategory) }}" method="POST"
                                                       onsubmit="return confirm('Yakin ingin menghapus kategori ini?')">
                                                     @csrf
@@ -53,6 +55,36 @@
                                             </div>
                                         </td>
                                     </tr>
+                                    @push('scripts')
+                                    <x-modal name="edit-category.{{ $productCategory->id }}" maxWidth="md" focusable>
+                                        <form method="POST" action="{{ route('product-categories.update', $productCategory) }}" class="p-4">
+                                            @csrf
+                                            @method('PUT')
+                                            <h2 class="text-lg font-medium text-gray-900">
+                                                Edit Kategori
+                                            </h2>
+
+                                            <div class="mt-4">
+                                                <x-input-label for="name" value="{{ __('Nama Kategori') }}" />
+                                                <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" value="{{ old('name', $productCategory->name) }}" required />
+                                                <x-input-error :messages="$errors->get('name')" class="mt-2" />
+                                            </div>
+                                            <div class="mt-4">
+                                                <x-input-label for="slug" value="{{ __('Slug Kategori') }}" />
+                                                <x-text-input id="slug" name="slug" type="text" class="mt-1 block w-full" value="{{ old('slug', $productCategory->slug) }}" required />
+                                                <x-input-error :messages="$errors->get('slug')" class="mt-2" />
+                                            </div>
+                                            <div class="mt-6 flex justify-end">
+                                                <x-secondary-button x-on:click="$dispatch('close')">
+                                                    {{ __('Batal') }}
+                                                </x-secondary-button>
+                                                <x-primary-button class="ms-3" type="submit">
+                                                    {{ __('Simpan') }}
+                                                </x-primary-button>
+                                            </div>
+                                        </form>
+                                    </x-modal>
+                                    @endpush
                                 @endforeach
                             </tbody>
                         </table>
@@ -65,6 +97,34 @@
         <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css">
     @endpush
     @push('scripts')
+        <x-modal name="create-new-category" maxWidth="md" focusable>
+            <form method="POST" action="{{ route('product-categories.store') }}" class="p-6">
+                @csrf
+                <h2 class="text-lg font-medium text-gray-900">
+                    Tambah Kategori Baru
+                </h2>
+
+                <div class="mt-4">
+                    <x-input-label for="name" value="{{ __('Nama Kategori') }}" />
+                    <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" value="{{ old('name') }}" required />
+                    <x-input-error :messages="$errors->get('name')" class="mt-2" />
+                </div>
+                <div class="mt-4">
+                    <x-input-label for="slug" value="{{ __('Slug Kategori') }}" />
+                    <x-text-input id="slug" name="slug" type="text" class="mt-1 block w-full" value="{{ old('slug') }}" required />
+                    <x-input-error :messages="$errors->get('slug')" class="mt-2" />
+                </div>
+                <div class="mt-6 flex justify-end">
+                    <x-secondary-button x-on:click="$dispatch('close')">
+                        {{ __('Batal') }}
+                    </x-secondary-button>
+
+                    <x-primary-button class="ms-3" type="submit">
+                        {{ __('Simpan') }}
+                    </x-primary-button>
+                </div>
+            </form>
+        </x-modal>
         <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
         <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
         <script>

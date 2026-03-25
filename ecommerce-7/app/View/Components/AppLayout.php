@@ -2,15 +2,22 @@
 
 namespace App\View\Components;
 
+use Closure;
 use Illuminate\View\Component;
 use Illuminate\View\View;
 
 class AppLayout extends Component
 {
+    public function __construct(
+        public ?string $title = null,
+    )
+    {
+        //
+    }
     /**
      * Get the view / contents that represents the component.
      */
-    public function render(): View
+    public function render() : View|Closure|string
     {
         return view('layouts.app');
     }
