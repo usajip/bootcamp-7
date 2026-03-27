@@ -20,4 +20,9 @@ class Product extends Model
     {
         return $this->belongsTo(ProductCategory::class, 'product_category_id');
     }
+
+    public function order_items() // 1 to many relationship with OrderItem model
+    {
+        return $this->hasMany(OrderItem::class);
+    }
 }
