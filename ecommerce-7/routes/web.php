@@ -21,16 +21,18 @@ Route::get('/checkout', function () {
     echo "Checkout Page";
 });
 
-Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::middleware('auth')->group(function () {
-    Route::prefix('admin')->group(function () {
-        Route::get('/dashboard', function () {
-            echo "Admin Dashboard";
-        });
+
+Route::middleware(['auth', 'admin'])->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+        ->name('dashboard');
+    Route::prefix('admin')->middleware('admin')->group(function () {
         Route::resource('products', ProductController::class);
         Route::resource('product-categories', ProductCategoryController::class);
     });
+});
+
+Route::middleware('auth')->group(function () {    
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
