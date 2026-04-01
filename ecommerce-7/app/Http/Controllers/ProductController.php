@@ -14,7 +14,14 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $products = Product::with('product_category')
-                        ->orderBy('created_at', 'desc');
+                        ->orderBy('price', 'desc');
+        
+        // if(
+        //     $request->has('price_order') 
+        //     && in_array($request->price_order, ['asc', 'desc'])
+        // ) {
+        //     $products->orderBy('price', $request->price_order);
+        // }
         if ($request->has('search')) {
             $products->where('name', 'like', '%' . $request->search . '%');
         }
@@ -42,9 +49,10 @@ class ProductController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Product $product)
+    public function show($id)
     {
-        //
+        $product = Product::with('product_category')->findOrFail($id);
+        return view('admin.product.show', compact('product'));
     }
 
     /**
