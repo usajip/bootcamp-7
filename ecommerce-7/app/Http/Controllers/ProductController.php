@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -14,7 +15,7 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $products = Product::with('product_category')
-                        ->orderBy('price', 'desc');
+                        ->orderBy('id', 'desc');
         
         // if(
         //     $request->has('price_order') 
@@ -43,7 +44,39 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'required|string|max:1000',
+            'price' => 'required|integer|min:0',
+            'stock' => 'required|integer|min:0',
+            'image' => 'required',
+            'product_category_id' => 'required|exists:product_categories,id',
+        ]);
+
+        if ($request->image) {
+            $imageData = $request->image;
+            list($type, $imageData) = explode(';', $imageData);
+            list(, $imageData) = explode(',', $imageData);
+            $imageData = base64_decode($imageData);
+            $imageName = 'products/' . uniqid() . '.webp';
+            Storage::disk('images')->put($imageName, $imageData);
+        }
+
+        $slug = strtolower(str_replace(' ', '-', $request->name)).'-'.uniqid();
+
+        Product::create([
+            'name' => $request->name,
+            'slug' => $slug,
+            'description' => $request->description,
+            'price' => $request->price,
+            'stock' => $request->stock,
+            'image' => $imageName,
+            'product_category_id' => $request->product_category_id,
+        ]);
+
+        return redirect()
+                ->route('products.index')
+                ->with('success', 'Product created successfully.');
     }
 
     /**

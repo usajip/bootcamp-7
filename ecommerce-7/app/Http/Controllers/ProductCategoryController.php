@@ -13,8 +13,9 @@ class ProductCategoryController extends Controller
     public function index()
     {
         $productCategories = ProductCategory::withCount('products')
-                                ->withSum('products as total_stock' , 'stock')
-                                ->get();
+            ->withSum('products as total_stock', 'stock')
+            ->get();
+
         return view('admin.product-category.index', compact('productCategories'));
     }
 
@@ -31,7 +32,27 @@ class ProductCategoryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:100|unique:product_categories,name',
+            // 'slug' => 'required|string|max:100|unique:product_categories,slug',
+        ]);
+
+        $slug = strtolower(str_replace(' ', '-', $request->name));
+
+        ProductCategory::create([
+            'name' => $request->name,
+            'slug' => $slug,
+        ]);
+
+        // $category = new ProductCategory;
+        // $category->name = $request->name;
+        // $category->slug = $request->slug;
+        // $category->save();
+
+        return redirect()
+                // ->route('product-categories.index')
+            ->back()
+            ->with('success', 'Product category created successfully.');
     }
 
     /**

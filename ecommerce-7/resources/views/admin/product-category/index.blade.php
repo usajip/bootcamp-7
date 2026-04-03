@@ -11,7 +11,11 @@
         </div>
     </x-slot>
     <div class="py-12">
+        {{-- success and error messages --}}
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="mb-[20px]">
+            @include('layouts.success-error-msg')
+            </div>
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
                     <div class="overflow-x-auto">
@@ -33,7 +37,7 @@
                                         <td>{{ $productCategory->name }}</td>
                                         <td>{{ $productCategory->slug }}</td>
                                         <td>{{ $productCategory->products_count }}</td>
-                                        <td>{{ $productCategory->total_stock }}</td>
+                                        <td>{{ $productCategory->total_stock ?? 'produk belum tersedia' }}</td>
                                         <td>
                                             <div class="flex items-center gap-2">
                                                 <x-primary-button
@@ -108,11 +112,6 @@
                     <x-input-label for="name" value="{{ __('Nama Kategori') }}" />
                     <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" value="{{ old('name') }}" required />
                     <x-input-error :messages="$errors->get('name')" class="mt-2" />
-                </div>
-                <div class="mt-4">
-                    <x-input-label for="slug" value="{{ __('Slug Kategori') }}" />
-                    <x-text-input id="slug" name="slug" type="text" class="mt-1 block w-full" value="{{ old('slug') }}" required />
-                    <x-input-error :messages="$errors->get('slug')" class="mt-2" />
                 </div>
                 <div class="mt-6 flex justify-end">
                     <x-secondary-button x-on:click="$dispatch('close')">
