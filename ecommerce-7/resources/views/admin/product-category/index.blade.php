@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-app-layout :title="'Product Category'">
     <x-slot name="header">
         <div class="flex items-center justify-between gap-4">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
@@ -48,7 +48,7 @@
                                                     {{ __('Edit') }}
                                                 </x-primary-button>
                                                 <form action="{{ route('product-categories.destroy', $productCategory) }}" method="POST"
-                                                      onsubmit="return confirm('Yakin ingin menghapus kategori ini?')">
+                                                      onsubmit="return confirm('Yakin ingin menghapus kategori dengan ID {{ $productCategory->id }}?')">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit"

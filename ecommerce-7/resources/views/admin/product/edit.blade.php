@@ -11,7 +11,7 @@
 		<div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 			<div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
 				<div class="p-6 text-gray-900">
-					<form method="POST" action="{{ route('products.update', $product) }}" enctype="multipart/form-data" class="space-y-6">
+					<form method="POST" action="{{ route('products.update', $product) }}" enctype="multipart/form-data" id="formUpload" class="space-y-6">
 						@csrf
 						@method('PUT')
 
@@ -34,12 +34,12 @@
 							</div>
 
 							<div>
-								<x-input-label for="image" value="{{ __('Replace Product Image') }}" />
-								<x-text-input id="image" name="image" type="file" class="mt-1 block w-full" accept="image/*" />
-								<p class="mt-2 text-sm text-gray-500">Kosongkan jika tidak ingin mengganti gambar. Jika pilih gambar baru, crop 1:1 dan output otomatis menjadi 800x800 px.</p>
-								<div id="image-crop-container" class="mt-3 hidden">
-									<div id="croppie-container"></div>
-								</div>
+								<x-input-label for="uploadImage" value="{{ __('Replace Product Image') }}" />
+								<x-text-input type="file" id="uploadImage" accept="image/*" class="mt-1 block w-full" />
+								<p class="mt-2 text-sm text-gray-500">Kosongkan jika tidak ingin mengganti gambar. Jika pilih gambar baru, crop 1:1 dan output otomatis menjadi 1280x1280 px.</p>
+								<div id="croppieContainer" class="mt-3" style="width: 100%; max-width: 600px;"></div>
+								<input type="hidden" name="image" id="imageResult">
+								<div id="image-error" class="mb-4 text-sm text-red-500" style="display:none;"></div>
 								<x-input-error :messages="$errors->get('image')" class="mt-2" />
 							</div>
 						</div>
@@ -86,134 +86,96 @@
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
 	@endpush
 	@push('scripts')
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-	<script>
-		document.addEventListener('DOMContentLoaded', function () {
-			const form = document.querySelector('form');
-			const imageInput = document.getElementById('image');
-			const cropContainer = document.getElementById('image-crop-container');
-			const croppieElement = document.getElementById('croppie-container');
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+		<script>
+			document.addEventListener('DOMContentLoaded', function () {
+				const form = document.getElementById('formUpload');
+				const uploadInput = document.getElementById('uploadImage');
+				const croppieElement = document.getElementById('croppieContainer');
+				const imageResultInput = document.getElementById('imageResult');
+				const imageError = document.getElementById('image-error');
 
-			let croppieInstance = null;
-			let cropReady = false;
-			let isSubmittingWithCroppedImage = false;
+				if (!form || !uploadInput || !croppieElement || !imageResultInput || typeof Croppie === 'undefined') {
+					return;
+				}
 
-			if (typeof Croppie !== 'undefined') {
-				croppieInstance = new Croppie(croppieElement, {
-					viewport: { width: 250, height: 250, type: 'square' },
-					boundary: { width: 320, height: 320 },
-					enableExif: true,
-					minZoom: 0.1,
-					maxZoom: 2.0,
+				let hasNewImage = false;
+				const allowedExtensions = ['jpg', 'jpeg', 'png', 'webp'];
+				const maxSize = 2 * (1024 * 1024);
+				const croppie = new Croppie(croppieElement, {
+					viewport: {
+						width: 320,
+						height: 320,
+						type: 'square'
+					},
+					boundary: {
+						width: 320,
+						height: 320
+					},
+					enableExif: true
 				});
-			}
 
-			imageInput.addEventListener('change', function () {
-				const file = this.files[0];
-				cropReady = false;
+				uploadInput.addEventListener('change', function (e) {
+					const file = e.target.files[0];
+					imageError.style.display = 'none';
+					imageError.textContent = '';
 
-				if (!file) {
-					cropContainer.classList.add('hidden');
-					return;
-				}
+					if (!file) {
+						hasNewImage = false;
+						imageResultInput.value = '';
+						return;
+					}
 
-				const fileType = file.type;
-				const validImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/jpg'];
-				if (!validImageTypes.includes(fileType)) {
-					alert('Please select a valid image file (JPEG, PNG, GIF, WEBP, JPG).');
-					this.value = '';
-					cropContainer.classList.add('hidden');
-					return;
-				}
+					if (file.size > maxSize) {
+						alert('Ukuran gambar maksimal 2MB');
+						e.target.value = '';
+						hasNewImage = false;
+						return;
+					}
 
-				const maxSize = 2 * 1024 * 1024;
-				if (file.size > maxSize) {
-					alert('The selected image is too large. Please select an image smaller than 2MB.');
-					this.value = '';
-					cropContainer.classList.add('hidden');
-					return;
-				}
+					const extension = file.name.split('.').pop().toLowerCase();
+					if (!allowedExtensions.includes(extension)) {
+						alert('Format gambar harus JPG, JPEG, PNG, atau WEBP');
+						e.target.value = '';
+						hasNewImage = false;
+						return;
+					}
 
-				if (!croppieInstance) {
-					return;
-				}
-
-				const reader = new FileReader();
-				reader.onload = function (event) {
-					croppieInstance.bind({ url: event.target.result })
-						.then(function () {
-							cropContainer.classList.remove('hidden');
-							cropReady = true;
-						})
-						.catch(function () {
-							alert('Failed to load image for cropping. Please try another image.');
-							imageInput.value = '';
-							cropContainer.classList.add('hidden');
-							cropReady = false;
+					hasNewImage = true;
+					const reader = new FileReader();
+					reader.onload = function (event) {
+						croppie.bind({
+							url: event.target.result
 						});
-				};
+					};
+					reader.readAsDataURL(file);
+				});
 
-				reader.readAsDataURL(file);
-			});
+				form.addEventListener('submit', function (e) {
+					if (!hasNewImage) {
+						return;
+					}
 
-			form.addEventListener('submit', function (event) {
-				const price = document.getElementById('price').value;
-				const stock = document.getElementById('stock').value;
-				const name = document.getElementById('name').value.trim();
-				const description = document.getElementById('description').value.trim();
+					e.preventDefault();
 
-				if (!name) {
-					alert('Product name is required.');
-					event.preventDefault();
-					return;
-				}
+					croppie.result({
+						type: 'base64',
+						size: { width: 1280, height: 1280 },
+						format: 'webp',
+						quality: 90
+					}).then(function (base64) {
+						const sizeInBytes = (base64.length * 3) / 4;
+						if (sizeInBytes > maxSize) {
+							imageError.textContent = 'Hasil gambar melebihi 2MB, kurangi kualitas atau pilih gambar lain.';
+							imageError.style.display = 'block';
+							return;
+						}
 
-				if (!description) {
-					alert('Product description is required.');
-					event.preventDefault();
-					return;
-				}
-
-				if (price < 0) {
-					alert('Price must be a positive number.');
-					event.preventDefault();
-				}
-
-				if (stock < 0) {
-					alert('Stock must be a positive number.');
-					event.preventDefault();
-				}
-
-				if (event.defaultPrevented || isSubmittingWithCroppedImage || !imageInput.files.length) {
-					return;
-				}
-
-				if (!croppieInstance || !cropReady) {
-					alert('Please select and crop the product image first.');
-					event.preventDefault();
-					return;
-				}
-
-				event.preventDefault();
-
-				croppieInstance.result({
-					type: 'blob',
-					size: { width: 800, height: 800 },
-					format: 'jpeg',
-					quality: 0.95,
-				}).then(function (blob) {
-					const croppedImage = new File([blob], `product-${Date.now()}.jpg`, { type: 'image/jpeg' });
-					const dataTransfer = new DataTransfer();
-					dataTransfer.items.add(croppedImage);
-					imageInput.files = dataTransfer.files;
-
-					isSubmittingWithCroppedImage = true;
-					form.submit();
-				}).catch(function () {
-					alert('Failed to crop image. Please try again.');
+						imageResultInput.value = base64;
+						form.submit();
+					});
 				});
 			});
-		});
-	</script>
+		</script>
 	@endpush
 </x-app-layout>

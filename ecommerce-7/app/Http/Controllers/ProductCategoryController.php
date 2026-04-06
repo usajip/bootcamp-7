@@ -76,7 +76,19 @@ class ProductCategoryController extends Controller
      */
     public function update(Request $request, ProductCategory $productCategory)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:100|unique:product_categories,name,'.$productCategory->id,
+            'slug' => 'required|string|max:100|unique:product_categories,slug,'.$productCategory->id,
+        ]);
+
+        $productCategory->update([
+            'name' => $request->name,
+            'slug' => $request->slug,
+        ]);
+
+        return redirect()
+            ->back()
+            ->with('success', 'Product category updated successfully.');
     }
 
     /**
@@ -84,6 +96,19 @@ class ProductCategoryController extends Controller
      */
     public function destroy(ProductCategory $productCategory)
     {
-        //
+        $id = $productCategory->id;
+        $product_count = $productCategory->products()->count();
+
+        if ($product_count > 0) {
+            return redirect()
+                ->back()
+                ->withErrors(['error' => 'Product category with ID ' . $id . ' cannot be deleted because it has associated products.']);
+        }
+
+        $productCategory->delete();
+
+        return redirect()
+            ->back()
+            ->with('success', 'Product category with ID ' . $id . ' deleted successfully.');
     }
 }
