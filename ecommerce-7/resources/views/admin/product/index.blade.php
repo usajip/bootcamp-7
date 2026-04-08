@@ -38,6 +38,7 @@
                                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Deskripsi</th>
                                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Harga</th>
                                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Stok</th>
+                                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Clicks</th>
                                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Gambar</th>
                                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Kategori</th>
                                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Aksi</th>
@@ -51,6 +52,7 @@
                                        <td class="px-4 py-3 text-sm text-gray-700">{{ $product->description }}</td>
                                        <td class="px-4 py-3 text-sm text-gray-700">{{ "Rp" . number_format($product->price, 0, ",", ".") }}</td>
                                        <td class="px-4 py-3 text-sm text-gray-700">{{ $product->stock }}</td>
+                                       <td class="px-4 py-3 text-sm text-gray-700">{{ $product->clicks }}</td>
                                        <td class="px-4 py-3">
                                             <img src="{{ asset('images/' . $product->image) }}" alt="{{ $product->name }}" class="w-16 h-16 object-cover rounded border border-gray-200">
                                         </td>

@@ -1,11 +1,11 @@
 @extends('template.layouts')
-@section('title', 'Cart Page')
+@section('title', 'Checkout Page')
 @section('content')
 <div class="container">
     <div class="row">
         <div class="col-12 pt-2">
-            <h1>Cart Page</h1>
-            <p>Ini adalah halaman cart</p>
+            <h1>Checkout Page</h1>
+            <p>Ini adalah halaman checkout</p>
         </div>
         <div class="col-12">
             @if(session('success'))
@@ -26,7 +26,6 @@
                             <th>Price</th>
                             <th>Quantity</th>
                             <th>Total</th>
-                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -34,32 +33,26 @@
                             <tr>
                                 <td>{{ $item->product->name }}</td>
                                 <td>Rp{{ number_format($item->product->price, 0, ',', '.') }}</td>
-                                <td>
-                                    <form method="POST" action="{{ route('cart.update', $item->id) }}">
-                                        @csrf
-                                        @method('PUT')
-                                        <input type="number" name="quantity" value="{{ $item->quantity }}" min="1" class="form-control d-inline-block w-auto">
-                                        <button type="submit" class="btn btn-primary btn-sm">Update</button>
-                                    </form>
-                                </td>
+                                <td>{{ $item->quantity }}</td>
                                 <td>Rp{{ number_format($item->product->price * $item->quantity, 0, ',', '.') }}</td>
-                                <td>
-                                    <form method="POST" action="{{ route('cart.destroy', $item->id) }}" onsubmit="return confirm('Are you sure you want to remove this item from the cart?');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-danger btn-sm">Remove</button>
-                                    </form>
-                                </td>
                             </tr>
                         @endforeach
                     </tbody>
                 </table>
 
-                {{-- Checkout Button --}}
-                <a href="{{ route('checkout') }}" class="btn btn-primary">Proceed to Checkout</a>
+                {{-- Here you would typically have a form to submit the order --}}
+                <form method="POST" action="{{ route('make.order') }}">
+                    @csrf
+                    <div class="mb-3">
+                        <label for="address" class="form-label">Shipping Address</label>
+                        <textarea class="form-control" id="address" name="address" rows="3" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Place Order</button>
+                </form>
             @else
-                <p>Your cart is empty.</p>
+                <p>Your cart is empty. Please add some products to proceed to checkout.</p>
             @endif
+        </div>
     </div>
 </div>
 @endsection

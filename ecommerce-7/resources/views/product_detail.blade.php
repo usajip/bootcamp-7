@@ -11,7 +11,21 @@
                 <p class="text-muted">Category: {{ $product->product_category->name }}</p>
                 <h3>Rp{{ number_format($product->price, 0, ',', '.') }}</h3>
                 <p>{{ $product->description }}</p>
-                <a href="#" class="btn btn-success">Add to Cart</a>
+                @if(session('success'))
+                    <div class="alert alert-success">
+                        {{ session('success') }}
+                    </div>
+                @endif
+                @if(session('error'))
+                    <div class="alert alert-danger">
+                        {{ session('error') }}
+                    </div>
+                @endif
+                <form method="POST" action="{{ route('cart.store') }}">
+                    @csrf
+                    <input type="hidden" name="product_id" value="{{ $product->id }}">
+                    <button type="submit" class="btn btn-success">Add to Cart</button>
+                </form>
             </div>
             <div class="col-12">
                 <h4>Recommended Products</h4>

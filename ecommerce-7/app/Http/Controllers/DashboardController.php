@@ -12,11 +12,11 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $jumlahProduk = Product::count();
-        $jumlahCategori = ProductCategory::count();
-        $jumlahOrder = Order::count();
-        $jumlahStok = Product::sum('stock');
-        $jumlahKlikProduct = 200;
+        $jumlahProduk       = Product::count();
+        $jumlahCategori     = ProductCategory::count();
+        $jumlahOrder        = Order::count();
+        $jumlahStok         = Product::sum('stock');
+        $jumlahKlikProduct  = Product::sum('clicks');
         $data = [
             ['label' => 'Jumlah produk', 'value' => $jumlahProduk, 'color' => '#4CAF50', 'icon' => 'box'],
             ['label' => 'Jumlah categori', 'value' => $jumlahCategori, 'color' => '#2196F3', 'icon' => 'category'],

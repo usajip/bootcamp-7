@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cart;
 use App\Models\Order;
+use App\Models\OrderItem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
@@ -28,15 +31,46 @@ class OrderController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'address' => 'required|string|max:255',
+        ]);
+
+        $order = Order::create([
+            'order_number' => 'ORD-'.strtoupper(uniqid()),
+            'user_id' => Auth::id(),
+            'status' => 'pending',
+            'shipping_address' => $request->address,
+            'total_amount' => Cart::where('user_id', Auth::id())->with('product')->get()->sum(function($cartItem) {
+                return $cartItem->quantity * $cartItem->product->price;
+            }),
+        ]);
+
+        $cartItems = Cart::where('user_id', Auth::id())->with('product')->get();
+        foreach ($cartItems as $cartItem) {
+            OrderItem::create([
+                'order_id' => $order->id,
+                'product_id' => $cartItem->product_id,
+                'quantity' => $cartItem->quantity,
+                'price' => $cartItem->product->price,
+            ]);
+        }
+
+        // Clear the cart after creating the order
+        Cart::where('user_id', Auth::id())->delete();
+
+        return redirect()->route('order.show', $order->order_number)->with('success', 'Order placed successfully.');
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Order $order)
+    public function show(string $order_number)
     {
-        //
+        $order = Order::where('order_number', $order_number)
+            ->with('items.product')
+            ->firstOrFail();
+
+        return view('order.show', compact('order'));
     }
 
     /**
