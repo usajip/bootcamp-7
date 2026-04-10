@@ -29,10 +29,12 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::prefix('admin')->middleware('admin')->group(function () {
         Route::resource('products', ProductController::class);
         Route::resource('product-categories', ProductCategoryController::class);
+        Route::post('orders/{order}/update-status', [OrderController::class, 'update'])->name('orders.updateStatus');
     });
 });
 
-Route::middleware('auth')->group(function () {    
+Route::middleware('auth')->group(function () {
+    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

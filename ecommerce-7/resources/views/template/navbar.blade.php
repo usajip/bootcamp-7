@@ -19,6 +19,9 @@
           </li>
           @endif
           <li class="nav-item">
+            <a class="nav-link" href="{{ route('orders.index') }}">Order</a>
+          </li>
+          <li class="nav-item">
             <a class="nav-link" href="{{ route('profile.edit') }}">Profile</a>
           </li>
           <li class="nav-item">

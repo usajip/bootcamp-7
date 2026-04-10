@@ -29,7 +29,10 @@
             </div>
 
             <div class="bg-white overflow-hidden shadow-sm rounded-lg p-6">
-                <h3 class="text-lg font-semibold text-gray-800 mb-4">Order Terbaru</h3>
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold text-gray-800">Order Terbaru</h3>
+                    <a href="{{ route('orders.index') }}" class="text-sm text-blue-500 hover:underline">Lihat Semua</a>
+                </div>
                 {{-- table for latest orders --}}
                 <div class="overflow-x-auto">
                     <table class="min-w-[640px] w-full divide-y divide-gray-200">
